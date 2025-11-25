@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from werkzeug.utils import secure_filename
 import PyPDF2
 
-# Load spaCy model
+
 nlp = spacy.load("en_core_web_sm")
 
 app = Flask(__name__)
@@ -71,12 +71,12 @@ def preprocess(text):
 def extract_skills(tokens):
     extracted = set()
 
-    # one-word skills
+    
     for word in tokens:
         if word in SKILL_LIBRARY:
             extracted.add(word)
 
-    # multi-word skills (rest api, machine learning)
+
     text = " ".join(tokens)
     for skill in SKILL_LIBRARY:
         if " " in skill:
