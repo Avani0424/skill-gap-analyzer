@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillGap Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- BLOBS -->
+    <div class="blob"></div>
+    <div class="blob blob2"></div>
+
+    <!-- CENTER CARD -->
+    <div class="container">
+        <h1>SkillGap Analyzer</h1>
+        <p class="subtitle">Upload your resume & JD to analyze matching skills</p>
+
+        <form action="/analyze" method="POST" enctype="multipart/form-data">
+
+            <label class="label">Upload Resume</label>
+            <input type="file" name="resume" class="input-file" required>
+
+            <label class="label">Upload Job Description</label>
+            <input type="file" name="jobdesc" class="input-file" required>
+
+            <button type="submit" class="btn">Analyze Skills</button>
+        </form>
+    </div>
+
+</body>
+</html>

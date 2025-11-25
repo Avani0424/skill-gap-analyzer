@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillGap Analysis Results</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='result.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- PAGE TITLE -->
+    <h1 class="page-title">Skill Extraction Results</h1>
+
+    <div class="two-column">
+
+        <!-- LEFT SIDE : Detailed Skills -->
+        <div class="card large-card">
+            <h2>Detailed Skill Results</h2>
+
+            <div class="section">
+                <h3>Matched Skills</h3>
+                <ul class="skill-list">
+                    {% for skill in matched_skills %}
+                        <li class="matched">{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Partial Matches</h3>
+                <ul class="skill-list">
+                    {% if partial_matches %}
+                        {% for skill in partial_matches %}
+                            <li class="partial">{{ skill }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="none">No partial matches found</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Missing Skills</h3>
+                <ul class="skill-list">
+                    {% for skill in missing_skills %}
+                        <li class="missing">{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Recommendations</h3>
+                <ul class="skill-list">
+                    {% for rec in recommendations %}
+                        <li class="recommend">{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE : Chart + Stats -->
+        <div class="card chart-card">
+            <h2>Skill Distribution</h2>
+
+            <div class="chart-box">
+                <img src="/static/graph.png" class="donut-chart" />
+                <div class="legend">
+                    <span class="legend-item"><span class="circle green"></span>Matched Skills</span>
+                    <span class="legend-item"><span class="circle red"></span>Missing Skills</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h4>{{ matched_skills|length }}</h4>
+                    <p>Matched Skills</p>
+                </div>
+
+                <div class="stat-box">
+                    <h4>{{ missing_skills|length }}</h4>
+                    <p>Missing Skills</p>
+                </div>
+
+                <div class="stat-box">
+                    <h4>{{ resume_skills|length }}</h4>
+                    <p>Total Skills</p>
+                </div>
+
+                <div class="stat-box">
+                    {% set total = matched_skills|length + missing_skills|length %}
+{% if total == 0 %}
+    <h4>0%</h4>
+{% else %}
+    <h4>{{ ((matched_skills|length / total) * 100)|round(1) }}%</h4>
+{% endif %}
+
+                    <p>Match Accuracy</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

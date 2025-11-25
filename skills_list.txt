@@ -1,0 +1,70 @@
+python
+java
+c
+c++
+flutter
+dart
+html
+css
+javascript
+node
+react
+angular
+vue
+bootstrap
+tailwind
+sql
+mysql
+postgresql
+mongodb
+firebase
+aws
+azure
+gcp
+git
+github
+gitlab
+docker
+kubernetes
+linux
+unix
+rest api
+json
+xml
+machine learning
+deep learning
+nlp
+computer vision
+data science
+data analysis
+tableau
+power bi
+excel
+fastapi
+django
+flask
+oop
+ds
+algorithms
+problem solving
+communication
+leadership
+teamwork
+adaptability
+creativity
+time management
+critical thinking
+debugging
+testing
+ui design
+ux design
+figma
+adobe xd
+photoshop
+illustrator
+project management
+agile
+scrum
+devops
+cloud computing
+microservices
