@@ -13,9 +13,7 @@ app.config["UPLOAD_FOLDER"] = "uploads"
 os.makedirs("uploads", exist_ok=True)
 
 
-# -----------------------------
-# LOAD SKILL LIST
-# -----------------------------
+
 def load_skill_list():
     skills = set()
     try:
@@ -32,9 +30,7 @@ def load_skill_list():
 SKILL_LIBRARY = load_skill_list()
 
 
-# -----------------------------
-# EXTRACT TEXT FROM FILE
-# -----------------------------
+
 def extract_text(file):
     filename = secure_filename(file.filename)
     ext = filename.split(".")[-1].lower()
@@ -43,7 +39,7 @@ def extract_text(file):
 
     text = ""
 
-    # PDF
+    
     if ext == "pdf":
         reader = PyPDF2.PdfReader(filepath)
         for page in reader.pages:
@@ -52,7 +48,7 @@ def extract_text(file):
                 text += page_text + " "
         return text
 
-    # TXT
+    
     elif ext == "txt":
         with open(filepath, "r", encoding="utf-8") as f:
             text = f.read()
@@ -61,9 +57,6 @@ def extract_text(file):
     return ""
 
 
-# -----------------------------
-# PREPROCESSING (lemmatization + clean words)
-# -----------------------------
 def preprocess(text):
     doc = nlp(text.lower())
     tokens = []
@@ -74,9 +67,7 @@ def preprocess(text):
     return tokens
 
 
-# -----------------------------
-# EXTRACT ONLY SKILLS FROM TOKENS
-# -----------------------------
+
 def extract_skills(tokens):
     extracted = set()
 
@@ -95,28 +86,24 @@ def extract_skills(tokens):
     return extracted
 
 
-# -----------------------------
-# MATCH SKILLS (exact + partial prefix)
-# -----------------------------
+
 def match_skills(resume_skills, jd_skills):
     matched = resume_skills.intersection(jd_skills)
 
     missing = jd_skills - resume_skills
 
-    # partial match using prefix (same as your original method)
+  
     partial = set()
     for skill in missing:
         for r in resume_skills:
-            if skill[:3] == r[:3]:  # e.g., manage & management
+            if skill[:3] == r[:3]:  
                 partial.add(skill)
 
     missing = missing - partial
     return matched, partial, missing
 
 
-# -----------------------------
-# PIE CHART
-# -----------------------------
+
 def generate_chart(matched_count, missing_count):
     labels = ["Matched", "Missing"]
     values = [matched_count, missing_count]
@@ -127,9 +114,7 @@ def generate_chart(matched_count, missing_count):
     plt.close()
 
 
-# -----------------------------
-# ROUTES
-# -----------------------------
+
 @app.route("/")
 def index():
     return render_template("index.html")
