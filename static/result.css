@@ -156,3 +156,26 @@ h2 {
     font-size: 14px;
     color: #6b7280;
 }
+
+.download-form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.download-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    font-size: 18px;
+    padding: 14px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    font-weight: 600;
+}
+
+.download-btn:hover {
+    background: #3e9140;
+    transform: scale(1.05);
+}
+

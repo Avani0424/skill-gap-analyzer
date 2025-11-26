@@ -56,7 +56,7 @@ body {
     backdrop-filter: blur(14px);
     animation: fadeIn 1s ease-out;
     z-index: 2;
-    position: relative; /* Ensures it stays above blobs */
+    position: relative; 
 }
 
 /* ------------------- TEXT ------------------- */

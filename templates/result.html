@@ -18,7 +18,7 @@
 
     <div class="two-column">
 
-        <!-- LEFT SIDE : Detailed Skills -->
+      
         <div class="card large-card">
             <h2>Detailed Skill Results</h2>
 
@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <!-- RIGHT SIDE : Chart + Stats -->
+    
         <div class="card chart-card">
             <h2>Skill Distribution</h2>
 
@@ -88,20 +88,31 @@
 
                 <div class="stat-box">
                     <h4>{{ resume_skills|length }}</h4>
-                    <p>Total Skills</p>
+                    <p>Total Skills in Resume</p>
                 </div>
 
                 <div class="stat-box">
                     {% set total = matched_skills|length + missing_skills|length %}
-{% if total == 0 %}
-    <h4>0%</h4>
-{% else %}
-    <h4>{{ ((matched_skills|length / total) * 100)|round(1) }}%</h4>
-{% endif %}
-
+                    {% if total == 0 %}
+                        <h4>0%</h4>
+                    {% else %}
+                        <h4>{{ ((matched_skills|length / total) * 100)|round(1) }}%</h4>
+                    {% endif %}
                     <p>Match Accuracy</p>
                 </div>
             </div>
+
+            <!-- DOWNLOAD REPORT BUTTON -->
+            <form action="/download" method="POST" class="download-form">
+                <input type="hidden" name="matched" value="{{ ','.join(matched_skills) }}">
+                <input type="hidden" name="partial" value="{{ ','.join(partial_matches) }}">
+                <input type="hidden" name="missing" value="{{ ','.join(missing_skills) }}">
+                
+                <button type="submit" class="download-btn">
+                    📄 Download PDF Report
+                </button>
+            </form>
+
         </div>
 
     </div>

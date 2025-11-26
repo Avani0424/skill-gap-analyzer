@@ -1,14 +1,12 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import spacy
 import matplotlib.pyplot as plt
 from werkzeug.utils import secure_filename
 import PyPDF2
-
-
+from reportlab.pdfgen import canvas
 
 nlp = spacy.load("en_core_web_sm")
-
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
@@ -26,7 +24,6 @@ def load_skill_list():
     except:
         print("Skill list file missing!")
     return skills
-
 
 SKILL_LIBRARY = load_skill_list()
 
@@ -54,7 +51,6 @@ def extract_text(file):
 
     return ""
 
-
 def preprocess(text):
     doc = nlp(text.lower())
     tokens = []
@@ -68,12 +64,10 @@ def preprocess(text):
 def extract_skills(tokens):
     extracted = set()
 
-    
     for word in tokens:
         if word in SKILL_LIBRARY:
             extracted.add(word)
 
-    
     text = " ".join(tokens)
     for skill in SKILL_LIBRARY:
         if " " in skill and skill in text:
@@ -81,23 +75,19 @@ def extract_skills(tokens):
 
     return extracted
 
-
 def match_skills(resume_skills, jd_skills):
     matched = resume_skills.intersection(jd_skills)
     missing = jd_skills - resume_skills
-
     partial = set()
 
     for skill in list(missing):
         for r in resume_skills:
-         
             if skill[:4] == r[:4]:
                 partial.add(skill)
                 break
 
     missing = missing - partial
     return matched, partial, missing
-
 
 
 def generate_chart(matched_count, missing_count):
@@ -113,7 +103,6 @@ def generate_chart(matched_count, missing_count):
 @app.route("/")
 def index():
     return render_template("index.html")
-
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -143,6 +132,50 @@ def analyze():
         recommendations=recommendations,
         resume_skills=sorted(resume_skills)
     )
+
+
+@app.route("/download", methods=["POST"])
+def download_report():
+    matched = request.form.get("matched").split(",")
+    partial = request.form.get("partial").split(",")
+    missing = request.form.get("missing").split(",")
+
+    file_path = "static/Skill_Report.pdf"
+    c = canvas.Canvas(file_path)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(100, 800, "Skill Gap Analysis Report")
+
+    y = 760
+    c.setFont("Helvetica", 12)
+    c.drawString(50, y, "Matched Skills:")
+    y -= 25
+
+    for m in matched:
+        if m.strip():
+            c.drawString(70, y, f"- {m}")
+            y -= 20
+
+    y -= 20
+    c.drawString(50, y, "Partially Matched Skills:")
+    y -= 25
+
+    for p in partial:
+        if p.strip():
+            c.drawString(70, y, f"- {p}")
+            y -= 20
+
+    y -= 20
+    c.drawString(50, y, "Missing Skills:")
+    y -= 25
+
+    for mis in missing:
+        if mis.strip():
+            c.drawString(70, y, f"- {mis}")
+            y -= 20
+
+    c.save()
+
+    return send_file(file_path, as_attachment=True)
 
 
 if __name__ == "__main__":
