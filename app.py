@@ -6,17 +6,15 @@ from werkzeug.utils import secure_filename
 import PyPDF2
 
 
-# Load SpaCy Model
+
 nlp = spacy.load("en_core_web_sm")
+
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
 os.makedirs("uploads", exist_ok=True)
 
 
-# -------------------------------
-# Load Skill List
-# -------------------------------
 def load_skill_list():
     skills = set()
     try:
@@ -33,9 +31,6 @@ def load_skill_list():
 SKILL_LIBRARY = load_skill_list()
 
 
-# -------------------------------
-# Extract Text
-# -------------------------------
 def extract_text(file):
     filename = secure_filename(file.filename)
     ext = filename.split(".")[-1].lower()
@@ -44,16 +39,14 @@ def extract_text(file):
 
     text = ""
 
-    # PDF Extraction
     if ext == "pdf":
         reader = PyPDF2.PdfReader(filepath)
         for page in reader.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + " "
+            t = page.extract_text()
+            if t:
+                text += t + " "
         return text
 
-    # Text file
     elif ext == "txt":
         with open(filepath, "r", encoding="utf-8") as f:
             text = f.read()
@@ -62,9 +55,6 @@ def extract_text(file):
     return ""
 
 
-# -------------------------------
-# Preprocessing (Tokenizing + Lemmatizing)
-# -------------------------------
 def preprocess(text):
     doc = nlp(text.lower())
     tokens = []
@@ -75,18 +65,15 @@ def preprocess(text):
     return tokens
 
 
-# -------------------------------
-# Extract Skills
-# -------------------------------
 def extract_skills(tokens):
     extracted = set()
 
-    # Single word skills
+    
     for word in tokens:
         if word in SKILL_LIBRARY:
             extracted.add(word)
 
-    # Multi-word skills
+    
     text = " ".join(tokens)
     for skill in SKILL_LIBRARY:
         if " " in skill and skill in text:
@@ -95,43 +82,24 @@ def extract_skills(tokens):
     return extracted
 
 
-# -------------------------------
-# Correct Partial Matching Using Lemmatization
-# -------------------------------
-def partial_match(word1, word2):
-    """ Return True if two skills are similar based on lemma root. """
-
-    lemma1 = nlp(word1)[0].lemma_
-    lemma2 = nlp(word2)[0].lemma_
-
-    # Exact lemma match → handled already
-    if lemma1 == lemma2:
-        return False
-
-    # Partial root match (first 4 letters of lemma)
-    return lemma1[:4] == lemma2[:4]
-
-
 def match_skills(resume_skills, jd_skills):
     matched = resume_skills.intersection(jd_skills)
     missing = jd_skills - resume_skills
 
     partial = set()
 
-    # NEW - NLP-based partial matching
     for skill in list(missing):
         for r in resume_skills:
-            if partial_match(skill, r):
+         
+            if skill[:4] == r[:4]:
                 partial.add(skill)
+                break
 
     missing = missing - partial
-
     return matched, partial, missing
 
 
-# -------------------------------
-# Chart
-# -------------------------------
+
 def generate_chart(matched_count, missing_count):
     labels = ["Matched", "Missing"]
     values = [matched_count, missing_count]
@@ -142,9 +110,6 @@ def generate_chart(matched_count, missing_count):
     plt.close()
 
 
-# -------------------------------
-# Routes
-# -------------------------------
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -155,25 +120,19 @@ def analyze():
     resume_file = request.files["resume"]
     jd_file = request.files["jobdesc"]
 
-    # Extract text
     resume_text = extract_text(resume_file)
     jd_text = extract_text(jd_file)
 
-    # Preprocess
     resume_tokens = preprocess(resume_text)
     jd_tokens = preprocess(jd_text)
 
-    # Extract Skills
     resume_skills = extract_skills(resume_tokens)
     jd_skills = extract_skills(jd_tokens)
 
-    # Match
     matched, partial, missing = match_skills(resume_skills, jd_skills)
 
-    # Chart
     generate_chart(len(matched), len(missing))
 
-    # Recommendations
     recommendations = [f"Learn '{m}' to improve your match score." for m in missing]
 
     return render_template(
